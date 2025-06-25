@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Anschlusspläne</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    iframe {
+      margin-top: 20px;
+      width: 100%;
+      height: 800px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Anschlusspläne</h1>
+  <p>Artikelnummer eingeben:</p>
+  <input type="text" id="artikelnummer" placeholder="z. B. 123456">
+  <button onclick="suchen()">Suchen</button>
+
+  <iframe id="pdfViewer" style="display:none;"></iframe>
+
+  <script>
+    async function suchen() {
+      const artikelnummer = document.getElementById("artikelnummer").value.trim();
+      if (!artikelnummer) {
+        alert("Bitte eine Artikelnummer eingeben.");
+        return;
+      }
+
+      try {
+        const response = await fetch("https://deinname.github.io/dein-repo/data/artikel.json"); // Pfad anpassen!
+        const daten = await response.json();
+
+        const eintrag = daten.find(item => item.Titel === artikelnummer);
+
+        if (!eintrag) {
+          alert("Artikelnummer nicht gefunden.");
+          return;
+        }
+
+        const pfad = encodeURIComponent(eintrag.Pfad);
+        const dateiname = encodeURIComponent(eintrag.Dokument);
+        const pdfUrl = `https://peneder.sharepoint.com/sites/FSF-AluAuftragsdokumente/Dokumente/${pfad}/${dateiname}.pdf`;
+
+        const iframe = document.getElementById("pdfViewer");
+        iframe.src = pdfUrl + "#toolbar=0&navpanes=0&statusbar=0";
+        iframe.style.display = "block";
+      } catch (error) {
+        console.error("Fehler beim Laden der Daten:", error);
+        alert("Fehler beim Laden der Daten.");
+      }
+    }
+  </script>
+</body>
+</html>
