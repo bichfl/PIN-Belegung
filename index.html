@@ -46,7 +46,7 @@
         return;
       }
 
-      const jsonUrl = "https://bichfl.github.io/PIN-Belegung/Test.JSON";
+      const jsonUrl = "https://bichfl.github.io/PIN-Belegung/Test.json";
       console.log("Versuche zu laden:", jsonUrl);
 
       try {
@@ -59,7 +59,6 @@
         }
 
         const daten = await response.json();
-
         const eintrag = daten.find(item => item.Titel === artikelnummer);
 
         if (!eintrag) {
@@ -70,7 +69,8 @@
         const pfad = eintrag.Pfad;
         const dateiname = encodeURIComponent(eintrag.Dokument);
 
-        const pdfUrl = `https://peneder.sharepoint.com/:b:/r/sites/FSF-AluAuftragsdokumente/Freigegebene%20Dokumente/${pfad}/${dateiname}.pdf`;
+        // ✅ KORREKTER PFAD (ohne :b:/r)
+        const pdfUrl = `https://peneder.sharepoint.com/sites/FSF-AluAuftragsdokumente/Freigegebene%20Dokumente/${pfad}/${dateiname}.pdf`;
 
         console.log("PDF URL:", pdfUrl);
 
