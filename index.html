@@ -79,7 +79,7 @@
         iframe.style.display = "block";
       } catch (error) {
         console.error("Fehler beim Laden der Daten:", error);
-        alert("Fehler beim Laden der Daten: " + error.message);
+        alert("Fehler beim Laden der Daten: " + (error.message || error));
       }
     }
   </script>
