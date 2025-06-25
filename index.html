@@ -47,7 +47,7 @@
       }
 
       try {
-        const response = await fetch("https://deinname.github.io/dein-repo/data/artikel.json"); // Pfad anpassen!
+        const response = await fetch("https://github.com/bichfl/PIN-Belegung/blob/main/Test.JSON"); // Pfad anpassen!
         const daten = await response.json();
 
         const eintrag = daten.find(item => item.Titel === artikelnummer);
