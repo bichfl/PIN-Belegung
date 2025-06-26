@@ -31,62 +31,56 @@
   <button onclick="suchen()">Suchen</button>
 
   <script>
-  async function fetchJsonMitFallback(url1, url2) {
-    try {
-      const res1 = await fetch(url1);
-      if (res1.ok) {
-        return await res1.json();
-      } else {
-        console.warn(`Konnte ${url1} nicht laden, versuche ${url2}...`);
-        const res2 = await fetch(url2);
-        if (res2.ok) {
-          return await res2.json();
+    async function fetchJsonMitFallback(url1, url2) {
+      try {
+        const res1 = await fetch(url1);
+        if (res1.ok) {
+          return await res1.json();
         } else {
-          throw new Error(`Beide Dateien nicht gefunden: ${url1}, ${url2}`);
+          console.warn(`Konnte ${url1} nicht laden, versuche ${url2}...`);
+          const res2 = await fetch(url2);
+          if (res2.ok) {
+            return await res2.json();
+          } else {
+            throw new Error(`Beide Dateien nicht gefunden: ${url1}, ${url2}`);
+          }
         }
+      } catch (error) {
+        throw new Error("Fehler beim Laden der JSON-Daten: " + error.message);
       }
-    } catch (error) {
-      throw new Error("Fehler beim Laden der JSON-Daten: " + error.message);
-    }
-  }
-
-  async function suchen() {
-    const artikelnummer = document.getElementById("artikelnummer").value.trim();
-    if (!artikelnummer) {
-      alert("Bitte eine Artikelnummer eingeben.");
-      return;
     }
 
-    const jsonUrl1 = "https://bichfl.github.io/PIN-Belegung/Test.json";
-    const jsonUrl2 = "https://bichfl.github.io/PIN-Belegung/Test.JSON";
-
-    try {
-      const daten = await fetchJsonMitFallback(jsonUrl1, jsonUrl2);
-      console.log("Eingegebene Artikelnummer:", artikelnummer);
-      console.table(daten);
-
-      const eintrag = daten.find(item =>
-        String(item.Titel).trim() === artikelnummer
-      );
-
-      if (!eintrag) {
-        alert("Artikelnummer nicht gefunden.");
-        console.warn("Nicht gefunden:", artikelnummer, "in", daten.map(d => d.Titel));
+    async function suchen() {
+      const artikelnummer = document.getElementById("artikelnummer").value.trim();
+      if (!artikelnummer) {
+        alert("Bitte eine Artikelnummer eingeben.");
         return;
       }
 
-      const pfad = eintrag.Pfad;
-      const dateiname = encodeURIComponent(eintrag.Dokument);
-      const pdfUrl = `https://peneder.sharepoint.com/:b:/r//sites/FSF-AluAuftragsdokumente/Freigegebene%20Dokumente/PIN-Belegung/${pfad}/${dateiname}.pdf`;
+      const timestamp = new Date().getTime();
+	  const jsonUrl1 = `https://bichfl.github.io/PIN-Belegung/Test.json?t=${timestamp}`;
+	  const jsonUrl2 = `https://bichfl.github.io/PIN-Belegung/Test.JSON?t=${timestamp}`;
 
-      console.log("PDF URL:", pdfUrl);
-      window.open(pdfUrl, '_blank');
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert(error.message);
+      try {
+        const daten = await fetchJsonMitFallback(jsonUrl1, jsonUrl2);
+        const eintrag = daten.find(item => item.Titel === artikelnummer);
+
+        if (!eintrag) {
+          alert("Artikelnummer nicht gefunden.");
+          return;
+        }
+
+        const pfad = eintrag.Pfad;
+        const dateiname = encodeURIComponent(eintrag.Dokument);
+        const pdfUrl = `https://peneder.sharepoint.com/:b:/r//sites/FSF-AluAuftragsdokumente/Freigegebene%20Dokumente/PIN-Belegung/${pfad}/${dateiname}.pdf`;
+
+        console.log("PDF URL:", pdfUrl);
+        window.open(pdfUrl, '_blank');
+      } catch (error) {
+        console.error("Fehler:", error);
+        alert(error.message);
+      }
     }
-  }
-</script>
-
+  </script>
 </body>
 </html>
