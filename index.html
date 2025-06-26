@@ -31,6 +31,25 @@
   <button onclick="suchen()">Suchen</button>
 
   <script>
+    async function fetchJsonMitFallback(url1, url2) {
+      try {
+        const res1 = await fetch(url1);
+        if (res1.ok) {
+          return await res1.json();
+        } else {
+          console.warn(`Konnte ${url1} nicht laden, versuche ${url2}...`);
+          const res2 = await fetch(url2);
+          if (res2.ok) {
+            return await res2.json();
+          } else {
+            throw new Error(`Beide Dateien nicht gefunden: ${url1}, ${url2}`);
+          }
+        }
+      } catch (error) {
+        throw new Error("Fehler beim Laden der JSON-Daten: " + error.message);
+      }
+    }
+
     async function suchen() {
       const artikelnummer = document.getElementById("artikelnummer").value.trim();
       if (!artikelnummer) {
@@ -38,19 +57,11 @@
         return;
       }
 
-      const jsonUrl = "https://bichfl.github.io/PIN-Belegung/Test.JSON";
-      console.log("Versuche zu laden:", jsonUrl);
+      const jsonUrl1 = "https://bichfl.github.io/PIN-Belegung/Test.json";
+      const jsonUrl2 = "https://bichfl.github.io/PIN-Belegung/Test.JSON";
 
       try {
-        const response = await fetch(jsonUrl);
-        console.log("Response Status:", response.status);
-
-        if (!response.ok) {
-          alert("Die Artikeldaten konnten nicht geladen werden. Status: " + response.status);
-          return;
-        }
-
-        const daten = await response.json();
+        const daten = await fetchJsonMitFallback(jsonUrl1, jsonUrl2);
         const eintrag = daten.find(item => item.Titel === artikelnummer);
 
         if (!eintrag) {
@@ -63,12 +74,10 @@
         const pdfUrl = `https://peneder.sharepoint.com/:b:/r//sites/FSF-AluAuftragsdokumente/Freigegebene%20Dokumente/${pfad}/${dateiname}.pdf`;
 
         console.log("PDF URL:", pdfUrl);
-
-        // Öffnet die PDF-Datei in einem neuen Tab
         window.open(pdfUrl, '_blank');
       } catch (error) {
-        console.error("Fehler beim Laden der Daten:", error);
-        alert("Fehler beim Laden der Daten: " + (error.message || error));
+        console.error("Fehler:", error);
+        alert(error.message);
       }
     }
   </script>
