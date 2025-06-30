@@ -27,7 +27,7 @@
 <body>
   <h1>Anschlusspläne</h1>
   <p>Artikelnummer eingeben:</p>
-  <input type="text" id="artikelnummer" placeholder="z. B. 123456" />
+  <input type="text" id="artikelnummer" placeholder="z. B. 918519" />
   <button onclick="suchen()">Suchen</button>
 
   <script>
@@ -63,7 +63,7 @@
 
       try {
         const daten = await fetchJsonMitFallback(jsonUrl1, jsonUrl2);
-        const eintrag = daten.find(item => item.Titel === artikelnummer);
+        const eintrag = daten.find(item => item.ArtNR === artikelnummer);
 
         if (!eintrag) {
           alert("Artikelnummer nicht gefunden.");
